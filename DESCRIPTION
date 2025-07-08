@@ -1,0 +1,12 @@
+Package: meteo4Vilaine
+Version: 0.0.0.9000
+Title: Package Pour Charger en Bdd Les Données Météo France et Exploiter La Bdd 
+Description: Utilise meteo4DCE pour charger les données au sein d'une base PostGIS.
+Authors@R: person(given = "Anthony",
+       family = "DE BURGHRAVE",
+       role = c("aut", "cre"),
+       email = "anthony.deburghrave@eaux-et-vilaine.bzh")
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
