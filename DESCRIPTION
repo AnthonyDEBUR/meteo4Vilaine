@@ -1,14 +1,30 @@
 Package: meteo4Vilaine
+Title: Package Pour Charger en Bdd Les Données Météo France et Exploiter
+    La Bdd
 Version: 0.0.0.9000
-Title: Package Pour Charger en Bdd Les Données Météo France et Exploiter La Bdd 
-Description: Utilise meteo4DCE pour charger les données au sein d'une base PostGIS.
-Authors@R: person(given = "Anthony",
-       family = "DE BURGHRAVE",
-       role = c("aut", "cre"),
-       email = "anthony.deburghrave@eaux-et-vilaine.bzh")
+Authors@R: 
+    person("Anthony", "DE BURGHRAVE", , "anthony.deburghrave@eaux-et-vilaine.bzh", role = c("aut", "cre"))
+Description: Utilise meteo4DCE pour charger les données au sein d'une base
+    PostGIS.
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 URL: https://github.com/AnthonyDEBUR/meteo4Vilaine
 BugReports: https://github.com/AnthonyDEBUR/meteo4Vilaine/issues
+Depends: 
+    R (>= 2.10)
+Imports: 
+    DBI,
+    gstat,
+    magrittr,
+    sf,
+    terra
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
+Config/fusen/version: 0.6.0
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
