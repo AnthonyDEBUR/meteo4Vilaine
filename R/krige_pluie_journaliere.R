@@ -7,22 +7,86 @@
 #' un modèle de krigeage basé sur les données de stations pluviométriques.
 #'
 #' @param objet_sf Un objet `sf` de type POINT, contenant les localisations pour lesquelles on souhaite estimer les précipitations.
-#' @param date Une date au format `Date` ou chaîne de caractères convertible en `Date`, correspondant au jour d'estimation.
+#' @param date_debut Premier jour pour lequel on veut exporter des données de précipitation. Format text type "%Y-%m-%d"
+#' @param date_fin Dernier jour pour lequel on veut exporter des données de précipitation. Format text type "%Y-%m-%d"
 #' @param con Une connexion à la base de données PostgreSQL contenant les données pluviométriques.
 #'
 #' @return Un vecteur numérique contenant, pour chaque point de `objet_sf`, la valeur estimée de précipitation (en mm) pour la date spécifiée.
 #'
 #' @examples
 #' \dontrun{
-#'   library(sf)
-#'   pts <- st_as_sf(data.frame(x = c(1, 2), y = c(48, 49)), coords = c("x", "y"), crs = 4326)
-#'   pts_l93 <- st_transform(pts, 2154)
-#'   krige_pluie_journaliere(pts_l93, "2023-01-01", con)
-#' }
+#'library(RPostgres)
+#'library(yaml)
 #'
-#' krige_pluie_journaliere()
+#'
+#'# Connexion à la base PostgreSQL
+#'#config <- yaml::read_yaml("//etc//Vilaine_explorer//config.yml")
+#'config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
+#'
+#'# Connexion à la base PostgreSQL
+#'con <- DBI::dbConnect(
+#'  Postgres(),
+#'  host = config$host,
+#'  port = config$port,
+#'  user = config$user,
+#'  password = config$password,
+#'  dbname = config$dbname
+#')
+#'
+#'# Coordonnées approximatives du centroïde de Rennes (en WGS84)
+#'rennes_coords <- data.frame(
+#'  lon = -1.6794,
+#'  lat = 48.1147
+#')
+#'
+#'# Créer un objet sf de type point en WGS84 (EPSG:4326)
+#'rennes_sf <- st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
+#'
+#'# Reprojeter en Lambert 93 (EPSG:2154)
+#'rennes_l93 <- st_transform(rennes_sf, crs = 2154)
+#'
+#'krige_pluie_journaliere(rennes_l93, 
+#'                        date_debut="2006-10-06", 
+#'                        date_fin="2006-10-06", 
+#'                        con=con)
+#' library(RPostgres)
+#' library(yaml)
+#'
+#'
+#' # Connexion à la base PostgreSQL
+#' #config <- yaml::read_yaml("//etc//Vilaine_explorer//config.yml")
+#' config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
+#'
+#' # Connexion à la base PostgreSQL
+#' con <- DBI::dbConnect(
+#'   Postgres(),
+#'   host = config$host,
+#'   port = config$port,
+#'   user = config$user,
+#'   password = config$password,
+#'   dbname = config$dbname
+#' )
+#'
+#' # Coordonnées approximatives du centroïde de Rennes (en WGS84)
+#' rennes_coords <- data.frame(
+#'   lon = -1.6794,
+#'   lat = 48.1147
+#' )
+#'
+#' # Créer un objet sf de type point en WGS84 (EPSG:4326)
+#' rennes_sf <- st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
+#'
+#' # Reprojeter en Lambert 93 (EPSG:2154)
+#' rennes_l93 <- st_transform(rennes_sf, crs = 2154)
+#'
+#'
+#' krige_pluie_journaliere(rennes_l93, 
+#'                         date_debut="2006-10-06", 
+#'                         date_fin="2006-10-06", 
+#'                         con=con)
+#'
 #' @export
-krige_pluie_journaliere <- function(objet_sf, date, con) {
+krige_pluie_journaliere <- function(objet_sf, date_debut,date_fin, con) {
   # Vérification des entrées
   if (!inherits(objet_sf, "sf")) {
     stop("L'objet fourni n'est pas un objet 'sf'.")
@@ -30,17 +94,30 @@ krige_pluie_journaliere <- function(objet_sf, date, con) {
   if (!all(sf::st_geometry_type(objet_sf) %in% c("POINT", "MultiPoint"))) {
     stop("L'objet 'sf' doit contenir uniquement des géométries de type POINT.")
   }
-  if (is.character(date)) {
-    date <- as.Date(date)
+# Vérification des dates
+  if (!inherits(date_debut, c("Date", "POSIXct", "POSIXt", "character"))) {
+    stop("date_debut doit être de type Date, POSIXct ou character.")
   }
-  if (!inherits(date, "Date")) {
-    stop("Le paramètre 'date' doit être une date valide.")
+  if (!inherits(date_fin, c("Date", "POSIXct", "POSIXt", "character"))) {
+    stop("date_fin doit être de type Date, POSIXct ou character.")
+  }
+
+  # Conversion en format Date si nécessaire
+  date_debut <- as.Date(date_debut)
+  date_fin <- as.Date(date_fin)
+
+  if (is.na(date_debut) || is.na(date_fin)) {
+    stop("Les dates doivent être valides et convertibles en format Date.")
+  }
+
+  if (date_debut > date_fin) {
+    stop("date_debut doit être antérieure ou égale à date_fin.")
   }
 
   # Récupération des données de précipitations
   pluvio <- pluviometrie_entre_2_dates(
-    date_debut = date,
-    date_fin = date,
+    date_debut = date_debut,
+    date_fin = date_fin,
     con = con,
     taux_completude = 1
   )

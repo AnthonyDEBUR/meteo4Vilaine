@@ -4,12 +4,14 @@
 \alias{krige_pluie_journaliere}
 \title{Krigeage des précipitations journalières}
 \usage{
-krige_pluie_journaliere(objet_sf, date, con)
+krige_pluie_journaliere(objet_sf, date_debut, date_fin, con)
 }
 \arguments{
 \item{objet_sf}{Un objet \code{sf} de type POINT, contenant les localisations pour lesquelles on souhaite estimer les précipitations.}
 
-\item{date}{Une date au format \code{Date} ou chaîne de caractères convertible en \code{Date}, correspondant au jour d'estimation.}
+\item{date_debut}{Premier jour pour lequel on veut exporter des données de précipitation. Format text type "\%Y-\%m-\%d"}
+
+\item{date_fin}{Dernier jour pour lequel on veut exporter des données de précipitation. Format text type "\%Y-\%m-\%d"}
 
 \item{con}{Une connexion à la base de données PostgreSQL contenant les données pluviométriques.}
 }
@@ -20,14 +22,4 @@ Un vecteur numérique contenant, pour chaque point de \code{objet_sf}, la valeur
 Cette fonction estime les précipitations journalières à une date donnée
 pour un ensemble de points fournis sous forme d'objet \code{sf}, en utilisant
 un modèle de krigeage basé sur les données de stations pluviométriques.
-}
-\examples{
-\dontrun{
-  library(sf)
-  pts <- st_as_sf(data.frame(x = c(1, 2), y = c(48, 49)), coords = c("x", "y"), crs = 4326)
-  pts_l93 <- st_transform(pts, 2154)
-  krige_pluie_journaliere(pts_l93, "2023-01-01", con)
-}
-
-krige_pluie_journaliere()
 }
