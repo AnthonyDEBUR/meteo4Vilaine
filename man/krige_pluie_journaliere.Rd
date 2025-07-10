@@ -4,14 +4,12 @@
 \alias{krige_pluie_journaliere}
 \title{Krigeage des précipitations journalières}
 \usage{
-krige_pluie_journaliere(objet_sf, date_debut, date_fin, con)
+krige_pluie_journaliere(objet_sf, date, con)
 }
 \arguments{
 \item{objet_sf}{Un objet \code{sf} de type POINT, contenant les localisations pour lesquelles on souhaite estimer les précipitations.}
 
-\item{date_debut}{Premier jour pour lequel on veut exporter des données de précipitation. Format text type "\%Y-\%m-\%d"}
-
-\item{date_fin}{Dernier jour pour lequel on veut exporter des données de précipitation. Format text type "\%Y-\%m-\%d"}
+\item{date}{Date pour laquelle on veut exporter des données de précipitation. Format text type "\%Y-\%m-\%d" ou Date ou POSIXct}
 
 \item{con}{Une connexion à la base de données PostgreSQL contenant les données pluviométriques.}
 }

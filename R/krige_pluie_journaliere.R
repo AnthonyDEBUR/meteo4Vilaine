@@ -7,8 +7,7 @@
 #' un modèle de krigeage basé sur les données de stations pluviométriques.
 #'
 #' @param objet_sf Un objet `sf` de type POINT, contenant les localisations pour lesquelles on souhaite estimer les précipitations.
-#' @param date_debut Premier jour pour lequel on veut exporter des données de précipitation. Format text type "%Y-%m-%d"
-#' @param date_fin Dernier jour pour lequel on veut exporter des données de précipitation. Format text type "%Y-%m-%d"
+#' @param date Date pour laquelle on veut exporter des données de précipitation. Format text type "%Y-%m-%d" ou Date ou POSIXct
 #' @param con Une connexion à la base de données PostgreSQL contenant les données pluviométriques.
 #'
 #' @return Un vecteur numérique contenant, pour chaque point de `objet_sf`, la valeur estimée de précipitation (en mm) pour la date spécifiée.
@@ -46,8 +45,7 @@
 #'rennes_l93 <- st_transform(rennes_sf, crs = 2154)
 #'
 #'krige_pluie_journaliere(rennes_l93, 
-#'                        date_debut="2006-10-06", 
-#'                        date_fin="2006-10-06", 
+#'                        date="2006-10-06", 
 #'                        con=con)
 #' library(RPostgres)
 #' library(yaml)
@@ -81,12 +79,11 @@
 #'
 #'
 #' krige_pluie_journaliere(rennes_l93, 
-#'                         date_debut="2006-10-06", 
-#'                         date_fin="2006-10-06", 
+#'                         date="2006-10-06", 
 #'                         con=con)
 #'
 #' @export
-krige_pluie_journaliere <- function(objet_sf, date_debut,date_fin, con) {
+krige_pluie_journaliere <- function(objet_sf, date, con) {
   # Vérification des entrées
   if (!inherits(objet_sf, "sf")) {
     stop("L'objet fourni n'est pas un objet 'sf'.")
@@ -95,29 +92,25 @@ krige_pluie_journaliere <- function(objet_sf, date_debut,date_fin, con) {
     stop("L'objet 'sf' doit contenir uniquement des géométries de type POINT.")
   }
 # Vérification des dates
-  if (!inherits(date_debut, c("Date", "POSIXct", "POSIXt", "character"))) {
-    stop("date_debut doit être de type Date, POSIXct ou character.")
-  }
-  if (!inherits(date_fin, c("Date", "POSIXct", "POSIXt", "character"))) {
-    stop("date_fin doit être de type Date, POSIXct ou character.")
+  if (!inherits(date, c("Date", "POSIXct", "POSIXt", "character"))) {
+    stop("date doit être de type Date, POSIXct ou character.")
   }
 
   # Conversion en format Date si nécessaire
-  date_debut <- as.Date(date_debut)
-  date_fin <- as.Date(date_fin)
+  date <- as.Date(date)
 
-  if (is.na(date_debut) || is.na(date_fin)) {
-    stop("Les dates doivent être valides et convertibles en format Date.")
+  if (is.na(date)) {
+    stop("La date doivent être au format Année-Mois-jour en text ou en date")
   }
 
-  if (date_debut > date_fin) {
-    stop("date_debut doit être antérieure ou égale à date_fin.")
-  }
-
+ 
+  objet_sf<-sf::st_transform(objet_sf, 2154)
+  
+  
   # Récupération des données de précipitations
   pluvio <- pluviometrie_entre_2_dates(
-    date_debut = date_debut,
-    date_fin = date_fin,
+    date_debut = date,
+    date_fin = date,
     con = con,
     taux_completude = 1
   )
@@ -144,7 +137,7 @@ krige_pluie_journaliere <- function(objet_sf, date_debut,date_fin, con) {
   # Interpolation par krigeage
 #  krige_result <- predict(model, newdata = grd)
   # Suppression du message d'information
-krige_result <- suppressMessages(predict(model, newdata = grd))
+krige_result <- suppressWarnings(suppressMessages(predict(model, newdata = grd)))
 
 
   # Extraction des valeurs interpolées pour les points d'intérêt
