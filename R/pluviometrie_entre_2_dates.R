@@ -13,12 +13,17 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' pluviometrie_entre_2_dates(date_debut='1981-01-01', date_fin = '1981-01-01',con=con)
-#' create_sql_requete_calcule_somme(con)
+#'}
 pluviometrie_entre_2_dates <- function(date_debut = '1980-01-01',
                                        date_fin = '1980-12-31',
                                        con = con,
                                        taux_completude = 1) {
+  
+  
+  nb_jours_donnees<-nb_jours_periode<-NULL
+  
   # Vérification des dates
   if (!inherits(date_debut, c("Date", "POSIXct", "POSIXt", "character"))) {
     stop("date_debut doit être de type Date, POSIXct ou character.")

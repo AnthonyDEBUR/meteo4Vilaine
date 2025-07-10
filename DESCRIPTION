@@ -16,6 +16,7 @@ Imports:
     gstat,
     magrittr,
     sf,
+    stats,
     terra
 Suggests: 
     knitr,

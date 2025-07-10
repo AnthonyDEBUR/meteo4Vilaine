@@ -21,3 +21,39 @@ Cette fonction estime les précipitations journalières à une date donnée
 pour un ensemble de points fournis sous forme d'objet \code{sf}, en utilisant
 un modèle de krigeage basé sur les données de stations pluviométriques.
 }
+\examples{
+\dontrun{
+library(RPostgres)
+library(yaml)
+
+
+# Connexion à la base PostgreSQL
+#config <- yaml::read_yaml("//etc//Vilaine_explorer//config.yml")
+config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
+
+# Connexion à la base PostgreSQL
+con <- DBI::dbConnect(
+ Postgres(),
+ host = config$host,
+ port = config$port,
+ user = config$user,
+ password = config$password,
+ dbname = config$dbname
+)
+
+# Coordonnées approximatives du centroïde de Rennes (en WGS84)
+rennes_coords <- data.frame(
+ lon = -1.6794,
+ lat = 48.1147
+)
+
+# Créer un objet sf de type point en WGS84 (EPSG:4326)
+rennes_sf <- sf::st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
+
+# Reprojeter en Lambert 93 (EPSG:2154)
+rennes_l93 <- sf::st_transform(rennes_sf, crs = 2154)
+
+krige_pluie_journaliere(rennes_l93, 
+                       date="2006-10-06", 
+                       con=con)}
+}

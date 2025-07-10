@@ -10,7 +10,11 @@ editor_options:
 
 ```{r development, include=FALSE}
 library(testthat)
+
+
 ```
+
+
 
 <!--
  You need to run the 'description' chunk in the '0-dev_history.Rmd' file before continuing your code there.
@@ -38,7 +42,20 @@ pkgload::load_all(export_all = FALSE)
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' library(RPostgres)
+#' config <- yaml::read_yaml("chemin/vers/config.yml")
+#' con <- DBI::dbConnect(
+#'   Postgres(),
+#'   host = config$host,
+#'   port = config$port,
+#'   user = config$user,
+#'   password = config$password,
+#'   dbname = config$dbname
+#' )
 #' create_sql_requete_calcule_somme(con)
+#' }
+
 create_sql_requete_calcule_somme <- function(con) {
   fonction_sql <- "
   CREATE OR REPLACE FUNCTION meteo.get_precipitations_par_station(
@@ -81,37 +98,13 @@ create_sql_requete_calcule_somme <- function(con) {
   $$ LANGUAGE plpgsql STABLE;
   "
 
-  dbExecute(con, fonction_sql)
+  DBI::dbExecute(con, fonction_sql)
 }
 
 
 
 ```
 
-
-
-```{r examples}
-library(RPostgres)
-library(yaml)
-library(sf)
-
-
-# Connexion à la base PostgreSQL
-#config <- yaml::read_yaml("//etc//Vilaine_explorer//config.yml")
-config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
-
-# Connexion à la base PostgreSQL
-con <- DBI::dbConnect(
-  Postgres(),
-  host = config$host,
-  port = config$port,
-  user = config$user,
-  password = config$password,
-  dbname = config$dbname
-)
-
-create_sql_requete_calcule_somme(con)
-```
 
 
 # Pluviométrie entre 2 dates
@@ -130,12 +123,17 @@ create_sql_requete_calcule_somme(con)
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' pluviometrie_entre_2_dates(date_debut='1981-01-01', date_fin = '1981-01-01',con=con)
-#' create_sql_requete_calcule_somme(con)
+#'}
 pluviometrie_entre_2_dates <- function(date_debut = '1980-01-01',
                                        date_fin = '1980-12-31',
                                        con = con,
                                        taux_completude = 1) {
+  
+  
+  nb_jours_donnees<-nb_jours_periode<-NULL
+  
   # Vérification des dates
   if (!inherits(date_debut, c("Date", "POSIXct", "POSIXt", "character"))) {
     stop("date_debut doit être de type Date, POSIXct ou character.")
@@ -188,7 +186,8 @@ pluviometrie_entre_2_dates <- function(date_debut = '1980-01-01',
 # valeurs_proches_sf
 ```{r function}
 #' valeurs_proches_sf
-#' Extraire les valeurs les plus proches depuis un objet sf de référence
+#' On injecte un objet sf de type points (points_sf). 
+#' En retour la fonction recherche, pour chaque élément de points_sf quel est le point de la couche ref_sf le plus proche. Il renvoie alors la valeur contenue dans la colonne "col_valeur" de ref_sf
 #'
 #' @param points_sf Un objet sf de type POINT (les points à interroger)
 #' @param ref_sf Un objet sf contenant les points de référence et une colonne de valeurs
@@ -198,9 +197,31 @@ pluviometrie_entre_2_dates <- function(date_debut = '1980-01-01',
 #' @export
 valeurs_proches_sf <- function(points_sf, ref_sf, col_valeur = "somme_precipitations.pred") {
   # Vérifications
-  stopifnot(inherits(points_sf, "sf"))
-  stopifnot(inherits(ref_sf, "sf"))
-  stopifnot(col_valeur %in% names(ref_sf))
+
+# Vérification des types
+ if (!inherits(points_sf, "sf")) {
+stop("L'argument 'points_sf' doit être un objet 'sf'.")
+}
+if (!inherits(ref_sf, "sf")) {
+stop("L'argument 'ref_sf' doit être un objet 'sf'.")
+}
+
+# Vérification des géométries
+ if (!all(sf::st_geometry_type(points_sf) %in% c("POINT", "MultiPoint"))) {
+ stop("L'objet 'points_sf' doit contenir uniquement des géométries de type POINT ou MultiPoint.")
+ }
+ if (!all(sf::st_geometry_type(ref_sf) %in% c("POINT", "MultiPoint"))) {
+ stop("L'objet 'ref_sf' doit contenir uniquement des géométries de type POINT ou MultiPoint.")
+ }
+
+ # Vérification de la colonne de valeur
+ if (!is.character(col_valeur) || length(col_valeur) != 1) {
+ stop("L'argument 'col_valeur' doit être une chaîne de caractères de longueur 1.")
+ }
+ if (!(col_valeur %in% names(ref_sf))) {
+ stop(sprintf("La colonne '%s' n'existe pas dans 'ref_sf'.", col_valeur))
+ }
+
   
   # Harmoniser les CRS
   if (!sf::st_crs(points_sf) == sf::st_crs(ref_sf)) {
@@ -261,14 +282,14 @@ valeurs_proches_sf <- function(points_sf, ref_sf, col_valeur = "somme_precipitat
 #')
 #'
 #'# Créer un objet sf de type point en WGS84 (EPSG:4326)
-#'rennes_sf <- st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
+#'rennes_sf <- sf::st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
 #'
 #'# Reprojeter en Lambert 93 (EPSG:2154)
-#'rennes_l93 <- st_transform(rennes_sf, crs = 2154)
+#'rennes_l93 <- sf::st_transform(rennes_sf, crs = 2154)
 #'
 #'krige_pluie_journaliere(rennes_l93, 
 #'                        date="2006-10-06", 
-#'                        con=con)
+#'                        con=con)}
 #' @export
 krige_pluie_journaliere <- function(objet_sf, date, con) {
   # Vérification des entrées
@@ -324,7 +345,7 @@ krige_pluie_journaliere <- function(objet_sf, date, con) {
   # Interpolation par krigeage
 #  krige_result <- predict(model, newdata = grd)
   # Suppression du message d'information
-krige_result <- suppressWarnings(suppressMessages(predict(model, newdata = grd)))
+krige_result <- suppressWarnings(suppressMessages(stats::predict(model, newdata = grd)))
 
 
   # Extraction des valeurs interpolées pour les points d'intérêt
@@ -333,43 +354,7 @@ krige_result <- suppressWarnings(suppressMessages(predict(model, newdata = grd))
 
 ```
   
-```{r example-krige_pluie_journaliere}
-library(RPostgres)
-library(yaml)
 
-
-# Connexion à la base PostgreSQL
-#config <- yaml::read_yaml("//etc//Vilaine_explorer//config.yml")
-config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
-
-# Connexion à la base PostgreSQL
-con <- DBI::dbConnect(
-  Postgres(),
-  host = config$host,
-  port = config$port,
-  user = config$user,
-  password = config$password,
-  dbname = config$dbname
-)
-
-# Coordonnées approximatives du centroïde de Rennes (en WGS84)
-rennes_coords <- data.frame(
-  lon = -1.6794,
-  lat = 48.1147
-)
-
-# Créer un objet sf de type point en WGS84 (EPSG:4326)
-rennes_sf <- st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
-
-# Reprojeter en Lambert 93 (EPSG:2154)
-rennes_l93 <- st_transform(rennes_sf, crs = 2154)
-
-
-krige_pluie_journaliere(rennes_l93, 
-                        date="2006-10-06", 
-                        con=con)
-
-```
   
 ```{r tests-krige_pluie_journaliere}
 test_that("krige_pluie_journaliere works", {

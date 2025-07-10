@@ -39,49 +39,14 @@
 #')
 #'
 #'# Créer un objet sf de type point en WGS84 (EPSG:4326)
-#'rennes_sf <- st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
+#'rennes_sf <- sf::st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
 #'
 #'# Reprojeter en Lambert 93 (EPSG:2154)
-#'rennes_l93 <- st_transform(rennes_sf, crs = 2154)
+#'rennes_l93 <- sf::st_transform(rennes_sf, crs = 2154)
 #'
 #'krige_pluie_journaliere(rennes_l93, 
 #'                        date="2006-10-06", 
-#'                        con=con)
-#' library(RPostgres)
-#' library(yaml)
-#'
-#'
-#' # Connexion à la base PostgreSQL
-#' #config <- yaml::read_yaml("//etc//Vilaine_explorer//config.yml")
-#' config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
-#'
-#' # Connexion à la base PostgreSQL
-#' con <- DBI::dbConnect(
-#'   Postgres(),
-#'   host = config$host,
-#'   port = config$port,
-#'   user = config$user,
-#'   password = config$password,
-#'   dbname = config$dbname
-#' )
-#'
-#' # Coordonnées approximatives du centroïde de Rennes (en WGS84)
-#' rennes_coords <- data.frame(
-#'   lon = -1.6794,
-#'   lat = 48.1147
-#' )
-#'
-#' # Créer un objet sf de type point en WGS84 (EPSG:4326)
-#' rennes_sf <- st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
-#'
-#' # Reprojeter en Lambert 93 (EPSG:2154)
-#' rennes_l93 <- st_transform(rennes_sf, crs = 2154)
-#'
-#'
-#' krige_pluie_journaliere(rennes_l93, 
-#'                         date="2006-10-06", 
-#'                         con=con)
-#'
+#'                        con=con)}
 #' @export
 krige_pluie_journaliere <- function(objet_sf, date, con) {
   # Vérification des entrées
@@ -137,7 +102,7 @@ krige_pluie_journaliere <- function(objet_sf, date, con) {
   # Interpolation par krigeage
 #  krige_result <- predict(model, newdata = grd)
   # Suppression du message d'information
-krige_result <- suppressWarnings(suppressMessages(predict(model, newdata = grd)))
+krige_result <- suppressWarnings(suppressMessages(stats::predict(model, newdata = grd)))
 
 
   # Extraction des valeurs interpolées pour les points d'intérêt

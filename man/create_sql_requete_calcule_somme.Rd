@@ -16,17 +16,9 @@ créé la requête demandée dans la base POSTGIS des données météo
 create_sql_requete_calcule_somme
 }
 \examples{
-create_sql_requete_calcule_somme(con)
+\dontrun{
 library(RPostgres)
-library(yaml)
-library(sf)
-
-
-# Connexion à la base PostgreSQL
-#config <- yaml::read_yaml("//etc//Vilaine_explorer//config.yml")
-config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
-
-# Connexion à la base PostgreSQL
+config <- yaml::read_yaml("chemin/vers/config.yml")
 con <- DBI::dbConnect(
   Postgres(),
   host = config$host,
@@ -35,6 +27,6 @@ con <- DBI::dbConnect(
   password = config$password,
   dbname = config$dbname
 )
-
 create_sql_requete_calcule_somme(con)
+}
 }

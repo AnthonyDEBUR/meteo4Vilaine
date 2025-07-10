@@ -3,7 +3,8 @@
 \name{valeurs_proches_sf}
 \alias{valeurs_proches_sf}
 \title{valeurs_proches_sf
-Extraire les valeurs les plus proches depuis un objet sf de référence}
+On injecte un objet sf de type points (points_sf).
+En retour la fonction recherche, pour chaque élément de points_sf quel est le point de la couche ref_sf le plus proche. Il renvoie alors la valeur contenue dans la colonne "col_valeur" de ref_sf}
 \usage{
 valeurs_proches_sf(points_sf, ref_sf, col_valeur = "somme_precipitations.pred")
 }
@@ -19,5 +20,6 @@ Un vecteur des valeurs les plus proches pour chaque point
 }
 \description{
 valeurs_proches_sf
-Extraire les valeurs les plus proches depuis un objet sf de référence
+On injecte un objet sf de type points (points_sf).
+En retour la fonction recherche, pour chaque élément de points_sf quel est le point de la couche ref_sf le plus proche. Il renvoie alors la valeur contenue dans la colonne "col_valeur" de ref_sf
 }

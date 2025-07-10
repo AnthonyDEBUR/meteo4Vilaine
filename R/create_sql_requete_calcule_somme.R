@@ -9,17 +9,9 @@
 #' @export
 #'
 #' @examples
-#' create_sql_requete_calcule_somme(con)
+#' \dontrun{
 #' library(RPostgres)
-#' library(yaml)
-#' library(sf)
-#'
-#'
-#' # Connexion à la base PostgreSQL
-#' #config <- yaml::read_yaml("//etc//Vilaine_explorer//config.yml")
-#' config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
-#'
-#' # Connexion à la base PostgreSQL
+#' config <- yaml::read_yaml("chemin/vers/config.yml")
 #' con <- DBI::dbConnect(
 #'   Postgres(),
 #'   host = config$host,
@@ -28,8 +20,9 @@
 #'   password = config$password,
 #'   dbname = config$dbname
 #' )
-#'
 #' create_sql_requete_calcule_somme(con)
+#' }
+
 create_sql_requete_calcule_somme <- function(con) {
   fonction_sql <- "
   CREATE OR REPLACE FUNCTION meteo.get_precipitations_par_station(
@@ -72,7 +65,7 @@ create_sql_requete_calcule_somme <- function(con) {
   $$ LANGUAGE plpgsql STABLE;
   "
 
-  dbExecute(con, fonction_sql)
+  DBI::dbExecute(con, fonction_sql)
 }
 
 

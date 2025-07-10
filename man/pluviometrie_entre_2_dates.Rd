@@ -27,6 +27,7 @@ Interroge la base POSTGIS de données météo quotidiennes et renvoie un objet s
 pluviometrie_entre_2_dates
 }
 \examples{
+\dontrun{
 pluviometrie_entre_2_dates(date_debut='1981-01-01', date_fin = '1981-01-01',con=con)
-create_sql_requete_calcule_somme(con)
+}
 }

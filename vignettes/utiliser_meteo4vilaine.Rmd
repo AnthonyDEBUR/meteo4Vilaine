@@ -1,0 +1,131 @@
+---
+title: "Utiliser le package meteo4Vilaine"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Utiliser le package meteo4Vilaine}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, eval=FALSE}
+library(meteo4Vilaine)
+```
+
+
+## Présentation
+
+Le package **`meteo4Vilaine`** permet :
+
+- de créer des fonctions SQL dans une base PostgreSQL/PostGIS,
+- d’interroger les précipitations entre deux dates,
+- d’interpoler les données par krigeage,
+- d’extraire des valeurs proches à partir d’objets `sf`.
+
+---
+
+## 1. Connexion à la base de données
+
+```{r, eval=FALSE}
+library(RPostgres)
+library(yaml)
+library(sf)
+
+config <- yaml::read_yaml("C://workspace//gwilenalim//yaml//config.yml")
+
+con <- DBI::dbConnect(
+  Postgres(),
+  host = config$host,
+  port = config$port,
+  user = config$user,
+  password = config$password,
+  dbname = config$dbname
+)
+```
+
+---
+
+## 2. Création de la fonction SQL qui permet de calculer des sommes de précipitations entre 2 dates
+
+Cette fonction est à exécuter une fois après création de la base de données
+
+```{r, eval=FALSE}
+create_sql_requete_calcule_somme(con)
+```
+
+---
+
+## 3. Extraction des précipitations entre deux dates
+Cette fonction permet d'extraire les données de précipitations en base entre deux dates.
+Elle renvoie un objet sf avec le positionnement des stations et la somme des précipitations (en mm) entre les deux dates.
+
+Seules les stations dont le nombre de jours avec des données disponibles / le nombre de jour entre les deux dates commandées est supérieur ou égale au paramètre complétude sont renvoyées.
+
+Par exemple si on interroge pour récupérer 100 jours de données et qu'on passe l'indicateur taux_completude à 0.5, seules les stations avec au moins 50 jours de données sur la période sont renvoyées.
+
+```{r, eval=FALSE}
+pluvio_sf <- pluviometrie_entre_2_dates(
+  date_debut = "2020-01-01",
+  date_fin = "2020-01-10",
+  con = con,
+  taux_completude = 0.8
+)
+
+head(pluvio_sf)
+
+```
+---
+
+## 4. Extraction de valeurs proches
+
+
+On injecte un objet sf de type points (points_sf). 
+En retour la fonction recherche, pour chaque élément de points_sf quel est le point de la couche ref_sf le plus proche. Il renvoie alors la valeur contenue dans la colonne "col_valeur" de ref_sf
+
+
+```{r, eval=FALSE}
+
+pluvio_sf <- pluviometrie_entre_2_dates(
+  date_debut = "2020-01-05",
+  date_fin = "2020-01-05",
+  con = con,
+  taux_completude = 0.8
+)
+
+valeurs_proches_sf(
+  points_sf = rennes_l93,
+  ref_sf = pluvio_sf,
+  col_valeur = "somme_precipitations"
+)
+```
+
+---
+
+## 5. Interpolation spatiale par krigeage
+Cette fonction permet, pour une date donnée, d'interpoler spatialement les résultats en utilisant l'ensemble des données disponibles à la même date.
+
+
+```{r, eval=FALSE}
+
+rennes_coords <- data.frame(lon = -1.6794, lat = 48.1147)
+rennes_sf <- st_as_sf(rennes_coords, coords = c("lon", "lat"), crs = 4326)
+rennes_l93 <- st_transform(rennes_sf, crs = 2154)
+
+krige_pluie_journaliere(rennes_l93, date = "2020-01-05", con = con)
+```
+
+
+---
+
+## Conclusion
+
+Le package `meteo4Vilaine` fournit une interface puissante pour interroger, analyser et interpoler des données météorologiques spatialisées.
+
+---
+
