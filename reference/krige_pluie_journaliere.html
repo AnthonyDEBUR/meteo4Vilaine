@@ -57,7 +57,7 @@ un modèle de krigeage basé sur les données de stations pluviométriques.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">krige_pluie_journaliere</span><span class="op">(</span><span class="va">objet_sf</span>, <span class="va">date_debut</span>, <span class="va">date_fin</span>, <span class="va">con</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">krige_pluie_journaliere</span><span class="op">(</span><span class="va">objet_sf</span>, <span class="va">date</span>, <span class="va">con</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -68,12 +68,8 @@ un modèle de krigeage basé sur les données de stations pluviométriques.</p>
 <dd><p>Un objet <code>sf</code> de type POINT, contenant les localisations pour lesquelles on souhaite estimer les précipitations.</p></dd>
 
 
-<dt id="arg-date-debut">date_debut<a class="anchor" aria-label="anchor" href="#arg-date-debut"></a></dt>
-<dd><p>Premier jour pour lequel on veut exporter des données de précipitation. Format text type "%Y-%m-%d"</p></dd>
-
-
-<dt id="arg-date-fin">date_fin<a class="anchor" aria-label="anchor" href="#arg-date-fin"></a></dt>
-<dd><p>Dernier jour pour lequel on veut exporter des données de précipitation. Format text type "%Y-%m-%d"</p></dd>
+<dt id="arg-date">date<a class="anchor" aria-label="anchor" href="#arg-date"></a></dt>
+<dd><p>Date pour laquelle on veut exporter des données de précipitation. Format text type "%Y-%m-%d" ou Date ou POSIXct</p></dd>
 
 
 <dt id="arg-con">con<a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
