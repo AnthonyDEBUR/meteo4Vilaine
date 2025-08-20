@@ -104,9 +104,9 @@ krige_pluie_journaliere <- function(objet_sf, date, con) {
   # Suppression du message d'information
 krige_result <- suppressWarnings(suppressMessages(stats::predict(model, newdata = grd)))
 # Les valeurs négatives sont converties en valeurs nulles.
-try(krige_result[krige_result<0]<-0)
-
+valeur<-round(valeurs_proches_sf(objet_sf, krige_result), 1)
+valeur[valeur<0]<-0
   # Extraction des valeurs interpolées pour les points d'intérêt
-  return(round(valeurs_proches_sf(objet_sf, krige_result), 1))
+  return(valeur)
 }
 
