@@ -54,7 +54,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>create_sql_requete_calcule_somme</h1>
-    <small class="dont-index">Source: <a href="https://github.com/AnthonyDEBUR/meteo4Vilaine/blob/main/R/create_sql_requete_calcule_somme.R" class="external-link"><code>R/create_sql_requete_calcule_somme.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/AnthonyDEBUR/meteo4Vilaine/blob/master/R/create_sql_requete_calcule_somme.R" class="external-link"><code>R/create_sql_requete_calcule_somme.R</code></a></small>
     <div class="hidden name"><code>create_sql_requete_calcule_somme.Rd</code></div>
     </div>
 
@@ -85,7 +85,7 @@
 <span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rpostgres.r-dbi.org" class="external-link">RPostgres</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">config</span> <span class="op">&lt;-</span> <span class="fu">yaml</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/yaml/man/read_yaml.html" class="external-link">read_yaml</a></span><span class="op">(</span><span class="st">"chemin/vers/config.yml"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu">Postgres</span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rpostgres.r-dbi.org/reference/Postgres.html" class="external-link">Postgres</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  host <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">host</span>,</span></span>
 <span class="r-in"><span>  port <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">port</span>,</span></span>
 <span class="r-in"><span>  user <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">user</span>,</span></span>
