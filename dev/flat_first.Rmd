@@ -93,7 +93,7 @@ create_sql_requete_calcule_somme <- function(con) {
       GROUP BY 
           s.id, s.alt, s.geometry
       HAVING 
-          SUM(d.\"RR\") > 0;
+          SUM(d.\"RR\") >= 0;
   END;
   $$ LANGUAGE plpgsql STABLE;
   "
@@ -346,7 +346,8 @@ krige_pluie_journaliere <- function(objet_sf, date, con) {
 #  krige_result <- predict(model, newdata = grd)
   # Suppression du message d'information
 krige_result <- suppressWarnings(suppressMessages(stats::predict(model, newdata = grd)))
-
+# Les valeurs négatives sont converties en valeurs nulles.
+krige_result[krige_result<0]<-0
 
   # Extraction des valeurs interpolées pour les points d'intérêt
   return(round(valeurs_proches_sf(objet_sf, krige_result), 1))
