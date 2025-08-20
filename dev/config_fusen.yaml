@@ -1,0 +1,19 @@
+flat_first.Rmd:
+  path: dev/flat_first.Rmd
+  state: active
+  R:
+  - R/create_sql_requete_calcule_somme.R
+  - R/pluviometrie_entre_2_dates.R
+  - R/valeurs_proches_sf.R
+  - R/krige_pluie_journaliere.R
+  tests: tests/testthat/test-krige_pluie_journaliere.R
+  vignettes: []
+  inflate:
+    flat_file: dev/flat_first.Rmd
+    vignette_name: .na
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: ask
+    clean: ask
+    codecov: false

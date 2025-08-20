@@ -3,3 +3,5 @@
 ^README\.Rmd$
 ^\.github$
 ^codecov\.yml$
+^meteo4Vilaine\.Rproj$
+^\.Rproj\.user$
