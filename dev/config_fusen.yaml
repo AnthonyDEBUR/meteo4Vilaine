@@ -6,6 +6,7 @@ flat_first.Rmd:
   - R/pluviometrie_entre_2_dates.R
   - R/valeurs_proches_sf.R
   - R/krige_pluie_journaliere.R
+  - R/krige_pluie.R
   tests: tests/testthat/test-krige_pluie_journaliere.R
   vignettes: []
   inflate:
