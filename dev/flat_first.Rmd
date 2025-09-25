@@ -531,14 +531,15 @@ valeur[valeur<0]<-0
 #' Elle utilise les stations météo disponibles dans l'emprise ou effectue une interpolation si aucune station n'est présente.
 #'
 #' @param sf_objet Objet sf représentant la zone d'intérêt
-#' @param date Date de fin de la période (au format Date ou chaîne de caractères)
+#' @param date_debut Date de début de la période (au format Date ou chaîne de caractères)
+#' @param date_fin Date de fin de la période (au format Date ou chaîne de caractères)
 #' @param nb_jours Nombre de jours avant la date pour lesquels on souhaite récupérer les données
 #' @param con Connexion à la base de données PostgreSQL/PostGIS
 #' @param taux_completude Seuil de complétude des données (entre 0 et 1)
 #'
 #' @return Un data.frame avec les colonnes : date, precipitation_mm, source (nom de la station ou "donnée interpolée")
 #' @export
-precipitations_par_zone <- function(sf_objet, date, nb_jours, con, taux_completude = 0.8) {
+precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con, taux_completude = 0.8) {
 
   library(sf)
   library(dplyr)
@@ -546,8 +547,6 @@ precipitations_par_zone <- function(sf_objet, date, nb_jours, con, taux_completu
   library(DBI)
 
   # 1. Calcul des dates
-  date_debut <- as.Date(date) - nb_jours
-  date_fin <- as.Date(date)
   dates <- seq(date_debut, date_fin, by = "day")
 
   # 2. Requête initiale pour récupérer les stations disponibles
