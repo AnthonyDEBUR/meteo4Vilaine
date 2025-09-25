@@ -5,6 +5,13 @@
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/news/index.html</loc></url>
+<url><loc>/reference/create_sql_requete_calcule_somme.html</loc></url>
+<url><loc>/reference/get_nom_station_meteo.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/krige_pluie.html</loc></url>
+<url><loc>/reference/krige_pluie_journaliere.html</loc></url>
+<url><loc>/reference/pluviometrie_entre_2_dates.html</loc></url>
+<url><loc>/reference/precipitations_par_zone.html</loc></url>
+<url><loc>/reference/valeurs_proches_sf.html</loc></url>
 </urlset>
 
