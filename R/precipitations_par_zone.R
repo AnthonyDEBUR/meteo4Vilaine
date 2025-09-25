@@ -126,7 +126,7 @@ precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con) {
   df_sortie <- df_sortie %>%
     left_join(noms_stations, by = c("source" = "id")) %>%
     mutate(source = ifelse(is.na(nom), source, nom)) %>%
-    select(date, precipitation_mm, source)
+    dplyr::select(date, precipitation_mm, source)
 
   return(df_sortie)
 }
