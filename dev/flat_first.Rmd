@@ -593,7 +593,8 @@ precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con) {
   dates_manquantes <- setdiff(dates, as.Date(df_sortie$date))
 
   if (length(dates_manquantes) > 0) {
-    for (date_i in dates_manquantes) {
+    for (k in 1:length(dates_manquantes)) {
+      date_i<-dates_manquantes[k]
       krige_i <- krige_pluie_journaliere(centroid, date = date_i, con = con)
 
       df_sortie <- bind_rows(df_sortie, data.frame(
