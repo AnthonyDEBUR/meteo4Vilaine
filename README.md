@@ -35,7 +35,6 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(meteo4Vilaine)
-#> Error in library(meteo4Vilaine): aucun package nommé 'meteo4Vilaine' n'est trouvé
 ## basic example code
 ```
 

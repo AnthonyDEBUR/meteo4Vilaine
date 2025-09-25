@@ -538,7 +538,45 @@ valeur[valeur<0]<-0
 #'
 #' @return Un data.frame avec les colonnes : date, precipitation_mm, source (nom de la station ou "donnée interpolée")
 #' @export
-precipitations_par_zone <- function(sf_objet, date, nb_jours, con, taux_completude = 0.8) {
+#'
+#' @examples
+#' \dontrun{
+#' library(sf)
+#' triangle_sf <- st_sf(
+#'  geometry = st_sfc(
+#'    st_polygon(list(rbind(
+#'      c(-1.6794, 48.1147),  # Rennes
+#'      c(-1.2100, 48.1230),  # Vitré
+#'      c(-1.5025, 47.6833),  # Derval
+#'      c(-1.6794, 48.1147)   # Retour à Rennes
+#'    )))
+#'  ),
+#'  crs = 4326
+#')
+#' df <- precipitations_par_zone(triangle_sf, date = "2022-01-10", nb_jours = 5, con = con)
+#' 
+#' # Coordonnées approximatives du centre de Theix-Noyalo
+#' carre <- sf::st_sfc(st_point(c(-2.685, 47.616)), crs = 4326)
+#' carre <- sf::st_transform(carre, 2154)
+#' 
+#' # Construction du carré
+#' half_side <- 25  # moitié du côté
+#' x <- sf::st_coordinates(carre)[1]
+#' y <- sf::st_coordinates(carre)[2]
+#' 
+#' carre <- st_polygon(list(rbind(
+#'   c(x - half_side, y - half_side),
+#'   c(x + half_side, y - half_side),
+#'   c(x + half_side, y + half_side),
+#'   c(x - half_side, y + half_side),
+#'   c(x - half_side, y - half_side)
+#' )))
+#' 
+#' carre <- sf::st_sf(geometry = sf::st_sfc(carre), crs = 2154)
+#' df2 <- precipitations_par_zone(carre, date = "2022-01-10", nb_jours = 5, con = con)
+#' 
+#' }
+precipitations_par_zone <- function(sf_objet, date, nb_jours, con) {
 
   library(sf)
   library(dplyr)
@@ -555,7 +593,7 @@ precipitations_par_zone <- function(sf_objet, date, nb_jours, con, taux_completu
     date_debut = date_debut,
     date_fin = date_fin,
     con = con,
-    taux_completude = taux_completude
+    taux_completude = 0.8
   )
 
   # 3. Reprojection de sf_objet dans le CRS des données météo
@@ -567,10 +605,7 @@ precipitations_par_zone <- function(sf_objet, date, nb_jours, con, taux_completu
   # 5. Sélection de la station la plus proche du centroïde et dans l'emprise
   stations_dans_zone <- sf::st_intersection(pluvio_temp, sf_objet)
 
-  # Initialisation du dataframe de sortie
-  df_sortie <- data.frame(date = as.Date(character()), precipitation_mm = numeric(), source = character())
-
-  if (nrow(stations_dans_zone) > 0) {
+    if (nrow(stations_dans_zone) > 0) {
     stations_dans_zone$distance <- sf::st_distance(stations_dans_zone, centroid)
     station_ref <- stations_dans_zone %>% slice_min(order_by = distance, n = 1)
     id_station_ref <- station_ref$id
@@ -587,22 +622,26 @@ precipitations_par_zone <- function(sf_objet, date, nb_jours, con, taux_completu
     ")
 
     df_sortie <- DBI::dbGetQuery(con, query)
-  }
+  } 
+    # 7. Complément par interpolation pour les dates manquantes
+    dates_manquantes <- setdiff(dates, as.Date(df_sortie$date))
 
-  # 7. Complément par interpolation pour les dates manquantes
-  dates_manquantes <- setdiff(dates, as.Date(df_sortie$date))
+    
+    
+    if (length(dates_manquantes) > 0) {
+      for (k in seq_along(dates_manquantes)) {
+        date_i<-dates_manquantes[k]
+        krige_i <- krige_pluie_journaliere(centroid, date = date_i, con = con)
 
-  if (length(dates_manquantes) > 0) {
-    for (date_i in dates_manquantes) {
-      krige_i <- krige_pluie_journaliere(centroid, date = date_i, con = con)
-
-      df_sortie <- bind_rows(df_sortie, data.frame(
-        date = date_i,
-        precipitation_mm = krige_i,
-        source = "donnée interpolée"
-      ))
+        df_sortie <- bind_rows(df_sortie, data.frame(
+          date = date_i,
+          precipitation_mm = krige_i,
+          source = "donnée interpolée"
+        ))
+      }
     }
-  }
+
+
 
   # 8. Ajout des noms des stations
   noms_stations <- get_nom_station_meteo(con, unique(df_sortie$source[df_sortie$source != "donnée interpolée"]))
