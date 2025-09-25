@@ -49,13 +49,7 @@ Elle utilise les stations météo disponibles dans l'emprise ou effectue une int
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">precipitations_par_zone</span><span class="op">(</span></span>
-<span>  <span class="va">sf_objet</span>,</span>
-<span>  <span class="va">date_debut</span>,</span>
-<span>  <span class="va">date_fin</span>,</span>
-<span>  <span class="va">con</span>,</span>
-<span>  taux_completude <span class="op">=</span> <span class="fl">0.8</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">precipitations_par_zone</span><span class="op">(</span><span class="va">sf_objet</span>, <span class="va">date_debut</span>, <span class="va">date_fin</span>, <span class="va">con</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -76,10 +70,6 @@ Elle utilise les stations météo disponibles dans l'emprise ou effectue une int
 
 <dt id="arg-con">con<a class="anchor" aria-label="anchor" href="#arg-con"></a></dt>
 <dd><p>Connexion à la base de données PostgreSQL/PostGIS</p></dd>
-
-
-<dt id="arg-taux-completude">taux_completude<a class="anchor" aria-label="anchor" href="#arg-taux-completude"></a></dt>
-<dd><p>Seuil de complétude des données (entre 0 et 1)</p></dd>
 
 
 <dt id="arg-nb-jours">nb_jours<a class="anchor" aria-label="anchor" href="#arg-nb-jours"></a></dt>
