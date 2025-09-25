@@ -4,13 +4,7 @@
 \alias{precipitations_par_zone}
 \title{Précipitations par zone géographique}
 \usage{
-precipitations_par_zone(
-  sf_objet,
-  date_debut,
-  date_fin,
-  con,
-  taux_completude = 0.8
-)
+precipitations_par_zone(sf_objet, date_debut, date_fin, con)
 }
 \arguments{
 \item{sf_objet}{Objet sf représentant la zone d'intérêt}
@@ -20,8 +14,6 @@ precipitations_par_zone(
 \item{date_fin}{Date de fin de la période (au format Date ou chaîne de caractères)}
 
 \item{con}{Connexion à la base de données PostgreSQL/PostGIS}
-
-\item{taux_completude}{Seuil de complétude des données (entre 0 et 1)}
 
 \item{nb_jours}{Nombre de jours avant la date pour lesquels on souhaite récupérer les données}
 }

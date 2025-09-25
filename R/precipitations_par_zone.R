@@ -10,7 +10,6 @@
 #' @param date_fin Date de fin de la période (au format Date ou chaîne de caractères)
 #' @param nb_jours Nombre de jours avant la date pour lesquels on souhaite récupérer les données
 #' @param con Connexion à la base de données PostgreSQL/PostGIS
-#' @param taux_completude Seuil de complétude des données (entre 0 et 1)
 #'
 #' @return Un data.frame avec les colonnes : date, precipitation_mm, source (nom de la station ou "donnée interpolée")
 #' @export
@@ -55,7 +54,7 @@
 #'  df2 <- precipitations_par_zone(carre, date_debut = "2022-01-01",date_fin = "2022-01-10", con = con)
 #' }
 #'
-precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con, taux_completude = 0.8) {
+precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con) {
 
   library(sf)
   library(dplyr)
@@ -72,7 +71,7 @@ precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con, taux_co
     date_debut = date_debut,
     date_fin = date_fin,
     con = con,
-    taux_completude = taux_completude
+    taux_completude = 0.8
   )
 
   # 3. Reprojection de sf_objet dans le CRS des données météo
