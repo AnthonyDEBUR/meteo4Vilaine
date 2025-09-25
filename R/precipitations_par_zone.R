@@ -6,14 +6,56 @@
 #' Elle utilise les stations météo disponibles dans l'emprise ou effectue une interpolation si aucune station n'est présente.
 #'
 #' @param sf_objet Objet sf représentant la zone d'intérêt
-#' @param date Date de fin de la période (au format Date ou chaîne de caractères)
+#' @param date_debut Date de début de la période (au format Date ou chaîne de caractères)
+#' @param date_fin Date de fin de la période (au format Date ou chaîne de caractères)
 #' @param nb_jours Nombre de jours avant la date pour lesquels on souhaite récupérer les données
 #' @param con Connexion à la base de données PostgreSQL/PostGIS
 #' @param taux_completude Seuil de complétude des données (entre 0 et 1)
 #'
 #' @return Un data.frame avec les colonnes : date, precipitation_mm, source (nom de la station ou "donnée interpolée")
 #' @export
-precipitations_par_zone <- function(sf_objet, date, nb_jours, con, taux_completude = 0.8) {
+#' @examples
+#' \dontrun{
+#' # Exemple d'utilisation de la fonction `precipitations_par_zone`
+#' library(sf)
+#'
+#' # Définition d'une zone triangulaire autour de Rennes
+#' triangle_sf <- st_sf(
+#'  geometry = st_sfc(
+#'      st_polygon(list(rbind(
+#'        c(-1.6794, 48.1147),  # Rennes
+#'        c(-1.2100, 48.1230),  # Vitré
+#'        c(-1.5025, 47.6833),  # Derval
+#'        c(-1.6794, 48.1147)   # Retour à Rennes
+#'      )))
+#'    ),
+#'    crs = 4326
+#'  )
+#'
+#'  # Appel de la fonction avec cette zone
+#'  df <- precipitations_par_zone(triangle_sf, date_debut = "2022-01-01",date_fin = "2022-01-10", con = con)
+#'
+#'  # Définition d'un carré autour de Theix-Noyalo
+#'  carre <- sf::st_sfc(st_point(c(-2.685, 47.616)), crs = 4326)
+#'  carre <- sf::st_transform(carre, 2154)
+#'
+#'  half_side <- 25  # moitié du côté
+#'  x <- sf::st_coordinates(carre)[1]
+#'  y <- sf::st_coordinates(carre)[2]
+#'
+#'  carre <- st_polygon(list(rbind(
+#'    c(x - half_side, y - half_side),
+#'    c(x + half_side, y - half_side),
+#'    c(x + half_side, y + half_side),
+#'    c(x - half_side, y + half_side),
+#'    c(x - half_side, y - half_side)
+#'  )))
+#'
+#'  carre <- sf::st_sf(geometry = sf::st_sfc(carre), crs = 2154)
+#'  df2 <- precipitations_par_zone(carre, date_debut = "2022-01-01",date_fin = "2022-01-10", con = con)
+#' }
+#'
+precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con, taux_completude = 0.8) {
 
   library(sf)
   library(dplyr)
@@ -21,8 +63,8 @@ precipitations_par_zone <- function(sf_objet, date, nb_jours, con, taux_completu
   library(DBI)
 
   # 1. Calcul des dates
-  date_debut <- as.Date(date) - nb_jours
-  date_fin <- as.Date(date)
+  date_debut<-as.Date(date_debut)
+  date_fin<-as.Date(date_fin)
   dates <- seq(date_debut, date_fin, by = "day")
 
   # 2. Requête initiale pour récupérer les stations disponibles

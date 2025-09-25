@@ -4,11 +4,11 @@ flat_first.Rmd:
   R:
   - R/create_sql_requete_calcule_somme.R
   - R/get_nom_station_meteo.R
-  - R/pluviometrie_entre_2_dates.R
-  - R/valeurs_proches_sf.R
-  - R/krige_pluie_journaliere.R
   - R/krige_pluie.R
+  - R/krige_pluie_journaliere.R
+  - R/pluviometrie_entre_2_dates.R
   - R/precipitations_par_zone.R
+  - R/valeurs_proches_sf.R
   tests: tests/testthat/test-krige_pluie_journaliere.R
   vignettes: []
   inflate:

@@ -547,6 +547,8 @@ precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con, taux_co
   library(DBI)
 
   # 1. Calcul des dates
+  date_debut<-as.Date(date_debut)
+  date_fin<-as.Date(date_fin)
   dates <- seq(date_debut, date_fin, by = "day")
 
   # 2. Requête initiale pour récupérer les stations disponibles
@@ -615,14 +617,54 @@ precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con, taux_co
 
 ```
 
+```{r example-precipitations_par_zone}
+#' \dontrun{
+# Exemple d'utilisation de la fonction `precipitations_par_zone`
+library(sf)
 
+# Définition d'une zone triangulaire autour de Rennes
+triangle_sf <- st_sf(
+ geometry = st_sfc(
+     st_polygon(list(rbind(
+       c(-1.6794, 48.1147),  # Rennes
+       c(-1.2100, 48.1230),  # Vitré
+       c(-1.5025, 47.6833),  # Derval
+       c(-1.6794, 48.1147)   # Retour à Rennes
+     )))
+   ),
+   crs = 4326
+ )
+
+ # Appel de la fonction avec cette zone
+ df <- precipitations_par_zone(triangle_sf, date_debut = "2022-01-01",date_fin = "2022-01-10", con = con)
+
+ # Définition d'un carré autour de Theix-Noyalo
+ carre <- sf::st_sfc(st_point(c(-2.685, 47.616)), crs = 4326)
+ carre <- sf::st_transform(carre, 2154)
+
+ half_side <- 25  # moitié du côté
+ x <- sf::st_coordinates(carre)[1]
+ y <- sf::st_coordinates(carre)[2]
+
+ carre <- st_polygon(list(rbind(
+   c(x - half_side, y - half_side),
+   c(x + half_side, y - half_side),
+   c(x + half_side, y + half_side),
+   c(x - half_side, y + half_side),
+   c(x - half_side, y - half_side)
+ )))
+
+ carre <- sf::st_sf(geometry = sf::st_sfc(carre), crs = 2154)
+ df2 <- precipitations_par_zone(carre, date_debut = "2022-01-01",date_fin = "2022-01-10", con = con)
+#' }
+
+```
 
 
 ```{r development-inflate, eval=FALSE}
 # Keep eval=FALSE to avoid infinite loop in case you hit the knit button
 # Execute in the console directly
 fusen::inflate(flat_file = "dev/flat_first.Rmd", vignette_name = NA)
-fusen::inflate(flat_file = "dev/flat_first.Rmd", vignette_name = "utiliser_meteo4vilaine")
 
 ```
 
