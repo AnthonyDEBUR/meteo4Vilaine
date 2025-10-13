@@ -563,7 +563,9 @@ precipitations_par_zone <- function(sf_objet, date_debut, date_fin, con) {
 
   # 4. Calcul du centroïde
   centroid <- sf::st_centroid(sf::st_union(sf_objet))
- 
+ centroid <- sf::st_centroid(sf::st_union(sf_objet))
+  centroid <- sf::st_sf(geometry = centroid)
+
   # 5. Sélection de la station la plus proche du centroïde et dans l'emprise
   stations_dans_zone <- sf::st_intersection(pluvio_temp, sf_objet)
 
